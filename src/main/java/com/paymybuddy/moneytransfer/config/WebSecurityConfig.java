@@ -8,7 +8,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -28,15 +28,16 @@ public class WebSecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .authorizeRequests(authorizeRequests ->
-                        authorizeRequests
-                                .requestMatchers("/auth/register", "/auth/login").permitAll()
-                                .requestMatchers("/images/**", "/js/**", "/css/**", "/webjars/**").permitAll()
-                                .anyRequest().authenticated()
+                .authorizeHttpRequests((requests) -> requests
+                        .requestMatchers("/auth/register", "/auth/login").permitAll()
+                        .requestMatchers("/images/**", "/js/**", "/css/**", "/webjars/**").permitAll()
+                        .anyRequest().authenticated()
                 )
-                .sessionManagement(sessionManagement ->
-                        sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                );
+                .formLogin((form) -> form
+                        .loginPage("/login")
+                        .permitAll()
+                )
+                .logout((logout) -> logout.permitAll());
 
         return http.build();
     }
@@ -48,6 +49,6 @@ public class WebSecurityConfig {
 
     @Bean
     public UserDetailsService userDetailsService() {
-        return username -> userService.findByUsername(username);
+        return username -> (UserDetails) userService.findByUsername(username);
     }
 }
