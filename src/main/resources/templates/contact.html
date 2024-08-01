@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <title>Contact</title>
+    <style>
+        .btn-orange {
+            background-color: orange !important;
+            border-color: orange !important;
+        }
+    </style>
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-light sticky-top">
+
+
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <span class="navbar-brand mb-0 h1">Pay My Buddy</span>
+        <ul class="navbar-nav ml-auto">
+            <li class="nav-item">
+                <a class="nav-link" href="#" th:href="@{/transfer}">Transférer<span class="sr-only">(current)</span></a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#" th:href="@{/profile}">Profil<span class="sr-only">(current)</span></a>
+            </li>
+            <li class="nav-item" >
+                <a class="nav-link active" aria-current="page" href="#" th:href="@{/contact}">Ajouter relation<span
+                        class="sr-only">(current)</span></a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#" th:href="@{/logout}">Se déconnecter<span
+                        class="sr-only">(current)</span></a>
+            </li>
+        </ul>
+    </div>
+</nav>
+
+<div class="container d-flex justify-content-center align-items-center vh-100">
+    <div class="form-container w-50">
+        <form class="form-inline row d-flex justify-content-center align-items-center w-100" th:action="@{/contact}"
+              method="post">
+            <div class="form-group mx-sm-3 mb-2 w-75">
+                <label for="connectedEmail" class="">Chercher une relation</label>
+                <input type="email" id="connectedEmail" name="connectedEmail" placeholder="Saisir une adresse mail"
+                       class="form-control w-100"/>
+            </div>
+            <button type="submit" class="btn btn-primary btn-orange mb-2">Ajouter</button>
+        </form>
+
+        <!-- Afficher un message de succès si le paramètre 'success' est présent -->
+        <div th:if="${param.success}" class="alert alert-success mt-3">
+            Contact ajouté avec succès!
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

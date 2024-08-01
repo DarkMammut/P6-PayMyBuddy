@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <title>Transférer</title>
+</head>
+<body>
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-light sticky-top">
+
+
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <span class="navbar-brand mb-0 h1">Pay My Buddy</span>
+        <ul class="navbar-nav ml-auto">
+            <li class="nav-item">
+                <a class="nav-link active" aria-current="page" href="#" th:href="@{/transfer}">Transférer<span
+                        class="sr-only">(current)</span></a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#" th:href="@{/profile}">Profil<span class="sr-only">(current)</span></a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#" th:href="@{/contact}">Ajouter relation<span
+                        class="sr-only"></span></a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#" th:href="@{/logout}">Se déconnecter<span
+                        class="sr-only"></span></a>
+            </li>
+        </ul>
+    </div>
+</nav>
+
+
+<div class="container mt-5 d-flex flex-column justify-content-center">
+
+    <div class="d-flex justify-content-center mt-5 font-weight-bold">
+        <span class="mr-2" th:text="${balance}">0,--</span>
+        <span>€</span>
+    </div>
+
+    <!-- Content specific to add money -->
+    <div class="d-flex justify-content-center mt-5">
+        <form th:action="@{/transfer/add}" method="post" class="needs-validation w-100" novalidate>
+            <div class="d-flex justify-content-center align-items-center">
+                <div class="form-group d-flex mt-2">
+                    <label for="addAmount" class="col-md-8">verser sur votre compte</label>
+                    <div class="input-group col-md-3">
+                        <input type="number" id="addAmount" name="addAmount" class="form-control" placeholder="0"
+                               step="1" required>
+                        <div class="input-group-append">
+                            <span class="input-group-text">€</span>
+                        </div>
+                    </div>
+                    <div class="invalid-feedback">
+                        Veuillez fournir un montant valide.
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary">Payer</button>
+            </div>
+            <div class="d-flex flex-column align-items-center">
+                <!-- Afficher un message d'erreur si le paramètre 'error' est présent -->
+                <div th:if="${param.adderror}" class="alert alert-danger mt-3 w-50" role="alert">
+                    Erreur lors du versement. Veuillez réessayer.
+                </div>
+
+                <!-- Afficher un message de succès si le paramètre 'success' est présent -->
+                <div th:if="${param.addsuccess}" class="alert alert-success mt-3 w-50" role="alert">
+                    Versement réalisée avec succès!
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Content specific to transfer money -->
+    <div class="d-flex justify-content-center mt-5">
+        <form th:action="@{/transfer}" method="post" class="needs-validation w-100" novalidate>
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="form-group mt-2 col-md-4">
+                    <label for="receiverUsername" class="sr-only">Sélectionner une relation</label>
+                    <select id="receiverUsername" name="receiverUsername" class="form-control" required>
+                        <option value="0" selected="selected">Sélectionner une relation</option>
+                        <option th:each="user : ${userConnections}" th:value="${user.username}"
+                                th:text="${user.username}"></option>
+                    </select>
+                    <div class="invalid-feedback">
+                        Veuillez sélectionner une relation.
+                    </div>
+                </div>
+                <div class="form-group mt-2 col-md-4">
+                    <label for="description" class="sr-only">Description</label>
+                    <input type="text" id="description" name="description" class="form-control"
+                           placeholder="Description" required>
+                    <div class="invalid-feedback">
+                        Veuillez fournir une description.
+                    </div>
+                </div>
+                <div class="form-group mt-2 col-md-2">
+                    <label for="transferAmount" class="sr-only">Montant</label>
+                    <div class="input-group">
+                        <input type="number" id="transferAmount" name="transferAmount" class="form-control"
+                               placeholder="0"
+                               step="1" required>
+                        <div class="input-group-append">
+                            <span class="input-group-text">€</span>
+                        </div>
+                    </div>
+                    <div class="invalid-feedback">
+                        Veuillez fournir un montant valide.
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary">Payer</button>
+            </div>
+            <div class="d-flex flex-column align-items-center">
+                <!-- Afficher un message d'erreur si le paramètre 'error' est présent -->
+                <div th:if="${param.error}" class="alert alert-danger mt-3 w-50" role="alert">
+                    Erreur lors du transfert. Veuillez réessayer.
+                </div>
+
+                <!-- Afficher un message de succès si le paramètre 'success' est présent -->
+                <div th:if="${param.success}" class="alert alert-success mt-3 w-50" role="alert">
+                    Transaction réalisée avec succès!
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!--Tableau des transactions-->
+    <div class="d-flex flex-column justify-content-center mt-5">
+        <h2>Mes Transactions</h2>
+        <table class="table table-striped">
+            <thead>
+            <tr>
+                <th>Username</th>
+                <th>Description</th>
+                <th>Montant</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="transaction : ${transactions}">
+                <td th:text="${transaction.receiver}"></td>
+                <td th:text="${transaction.description}"></td>
+                <td th:text="${transaction.amount}"></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Optional: Include additional scripts or footer content if needed -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

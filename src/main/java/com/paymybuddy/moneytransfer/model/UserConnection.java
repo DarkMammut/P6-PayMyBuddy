@@ -1,15 +1,12 @@
 package com.paymybuddy.moneytransfer.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
-import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.JoinColumn;
+import jakarta.persistence.*;
 import lombok.Data;
 
 @Entity
 @Table(name = "UserConnection")
 @Data
+@IdClass(UserConnectionId.class)
 public class UserConnection {
 
     @Id

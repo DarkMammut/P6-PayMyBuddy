@@ -1,9 +1,7 @@
 package com.paymybuddy.moneytransfer.model;
 
 import jakarta.persistence.*;
-
 import java.util.Set;
-
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -27,6 +25,12 @@ public class User {
     @Column(name = "password", nullable = false, unique = true)
     private String password;
 
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "user_roles", joinColumns = @JoinColumn(name = "userID"))
+    @Column(name = "role")
+    private Set<String> roles;
+
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private Set<UserConnection> connections;
+
 }
