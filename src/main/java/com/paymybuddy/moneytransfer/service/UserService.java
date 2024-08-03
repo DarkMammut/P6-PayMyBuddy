@@ -11,6 +11,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Service
@@ -18,11 +19,28 @@ import java.util.stream.Collectors;
 public class UserService {
     private static final Logger logger = LoggerFactory.getLogger(UserService.class);
 
+    private static final Pattern EMAIL_PATTERN = Pattern.compile("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,6}$");
+    private static final Pattern USERNAME_PATTERN = Pattern.compile("^[a-zA-Z0-9._-]{3,20}$");
+    private static final Pattern PASSWORD_PATTERN = Pattern.compile("^(?=.*[0-9])(?=.*[a-zA-Z])(?=.*[@#$%^&+=]).{8,20}$");
+
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final UserConnectionRepository userConnectionRepository;
 
     public void saveUser(User user) {
+        if (!isValidEmail(user.getEmail())) {
+            logger.error("Invalid email address: {}", user.getEmail());
+            throw new IllegalArgumentException("Invalid email format");
+        }
+        if (!isValidUsername(user.getUsername())) {
+            logger.error("Invalid username format: {}", user.getUsername());
+            throw new IllegalArgumentException("Invalid username format");
+        }
+        if (!isValidPassword(user.getPassword())) {
+            logger.error("Invalid password format: {}", user.getPassword());
+            throw new IllegalArgumentException("Invalid password format");
+        }
+
         logger.info("Saving user: {}", user.getUsername());
         user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
         userRepository.save(user);
@@ -61,12 +79,26 @@ public class UserService {
         if (user == null) {
             throw new IllegalArgumentException("User not found");
         }
-        if (newPassword == null) {
-            throw new IllegalArgumentException("Empty password");
+        if (!isValidEmail(newEmail)) {
+            throw new IllegalArgumentException("Invalid email format");
         }
+        if (!isValidUsername(newUsername)) {
+            throw new IllegalArgumentException("Invalid username format");
+        }
+
         user.setUsername(newUsername);
         user.setEmail(newEmail);
-        user.setPassword(bCryptPasswordEncoder.encode(newPassword));
+
+        if (newPassword == null || newPassword.isEmpty()) {
+            logger.info("New password is empty. Retaining the old password.");
+        } else {
+            if (!isValidPassword(newPassword)) {
+                logger.error("New password is invalid.");
+                throw new IllegalArgumentException("Invalid password format");
+            }
+            user.setPassword(bCryptPasswordEncoder.encode(newPassword));
+        }
+
         userRepository.save(user);
     }
 
@@ -76,5 +108,17 @@ public class UserService {
         return connections.stream()
                 .map(UserConnection::getConnectedUser)
                 .collect(Collectors.toList());
+    }
+
+    private boolean isValidEmail(String email) {
+        return email != null && EMAIL_PATTERN.matcher(email).matches();
+    }
+
+    private boolean isValidUsername(String username) {
+        return username != null && USERNAME_PATTERN.matcher(username).matches();
+    }
+
+    private boolean isValidPassword(String password) {
+        return password != null && PASSWORD_PATTERN.matcher(password).matches();
     }
 }

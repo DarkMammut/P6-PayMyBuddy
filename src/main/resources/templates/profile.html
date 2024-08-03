@@ -23,7 +23,7 @@
                 <a class="nav-link" href="#" th:href="@{/transfer}">Transférer</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link active" aria-current="page" href="#" th:href="@{/profile}">Profil<span
+                <a class="nav-link active text-primary" aria-current="page" href="#" th:href="@{/profile}">Profil<span
                         class="sr-only">(current)</span></a>
             </li>
             <li class="nav-item">
@@ -37,37 +37,50 @@
 </nav>
 
 <!-- Content specific to Edit Profile -->
-<div class="container mt-5">
+<div class="container mt-5 d-flex justify-content-center align-items-center">
     <form th:action="@{/profile}" th:object="${user}" method="post" class="needs-validation" novalidate>
-        <div class="form-group row">
-            <label for="username" class="col-sm-2 col-form-label">Username</label>
-            <div class="col-sm-3">
-                <input type="text" id="username" name="username" class="form-control" th:field="*{username}" required>
+        <div class="d-flex">
+            <div class="container-fluid">
+                <div class="form-group">
+                    <div class="d-flex">
+                        <label for="username" class="w-50">Username</label>
+                        <input type="text" id="username" name="username" class="form-control w-50" th:field="*{username}" required>
+                    </div>
+                    <div class="invalid-feedback">
+                        Veuillez fournir un nom d'utilisateur.
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="d-flex">
+                        <label for="email" class="w-50">Mail</label>
+                        <input type="email" id="email" name="email" class="form-control" th:field="*{email}" required>
+                    </div>
+                    <div class="invalid-feedback">
+                        Veuillez fournir une adresse email valide.
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="d-flex">
+                        <label for="password" class="w-50">Mot de passe</label>
+                        <input type="password" id="password" name="password" class="form-control" th:placeholder="${#strings.repeat('•', 8)}" th:field="*{password}">
+                    </div>
+                </div>
             </div>
-            <div class="invalid-feedback">
-                Veuillez fournir un nom d'utilisateur.
+            <div class="d-flex flex-column justify-content-end">
+                <button type="submit" class="btn btn-primary">Modifier</button>
             </div>
         </div>
-        <div class="form-group row">
-            <label for="email" class="col-sm-2 col-form-label">Mail</label>
-            <div class="col-sm-4">
-                <input type="email" id="email" name="email" class="form-control" th:field="*{email}" required>
-            </div>
-            <div class="invalid-feedback">
-                Veuillez fournir une adresse email valide.
-            </div>
-        </div>
-        <div class="form-group row">
-            <label for="password" class="col-sm-2 col-form-label">Mot de passe</label>
-            <div class="col-sm-4">
-                <input type="password" id="password" name="password" class="form-control" value="12345" th:field="*{password}">
-            </div>
-        </div>
-        <button type="submit" class="btn btn-primary">Modifier</button>
 
-        <!-- Afficher un message de succès si le paramètre 'success' est présent -->
-        <div th:if="${param.success}" class="alert alert-success mt-3">
-            Profil modifié avec succès!
+        <div class="d-flex flex-column align-items-center">
+            <!-- Afficher un message d'erreur si le paramètre 'error' est présent -->
+            <div th:if="${param.error}" class="alert alert-danger mt-3" role="alert">
+                Erreur lors de la mise à jour des informations personnelles. Veuillez réessayer.
+            </div>
+
+            <!-- Afficher un message de succès si le paramètre 'success' est présent -->
+            <div th:if="${param.success}" class="alert alert-success mt-3" role="alert">
+                Mise à jour des informations personnelles réalisée avec succès!
+            </div>
         </div>
     </form>
 </div>

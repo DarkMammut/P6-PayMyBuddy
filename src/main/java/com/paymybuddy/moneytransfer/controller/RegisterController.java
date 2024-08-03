@@ -34,21 +34,26 @@ public class RegisterController {
 
         // Check for existing username and email
         if (userService.usernameExists(user.getUsername())) {
-            logger.warn("Username '{}' already exists", user.getUsername());
-            model.addAttribute("error", "Username already exists");
-            return "register";
+            logger.error("Username '{}' already exists", user.getUsername());
+            model.addAttribute("error", "Username déjà utilisé");
+            return "redirect:/register?error";
         }
 
         if (userService.emailExists(user.getEmail())) {
-            logger.warn("Email '{}' already exists", user.getEmail());
-            model.addAttribute("error", "Email already exists");
-            return "register";
+            logger.error("Email '{}' already exists", user.getEmail());
+            model.addAttribute("error", "Un compte existe déjà avec cette adresse email");
+            return "redirect:/register?error";
         }
 
         // Save the user and create an account if everything is fine
-        userService.saveUser(user);
-        accountService.createAccount(user);
-        logger.info("User '{}' registered successfully", user.getUsername());
-        return "redirect:/login";
+        try {
+            userService.saveUser(user);
+            accountService.createAccount(user);
+            logger.info("User '{}' registered successfully", user.getUsername());
+            return "redirect:/login";
+        } catch (Exception e) {
+            model.addAttribute("error", e.getMessage());
+            return "redirect:/register?error";
+        }
     }
 }

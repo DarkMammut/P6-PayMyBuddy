@@ -42,9 +42,10 @@ public class UserServiceTest {
     public void testSaveUser() {
         User user = new User();
         user.setUsername("testuser");
-        user.setPassword("password");
+        user.setEmail("test@test.test");
+        user.setPassword("password123@");
 
-        when(bCryptPasswordEncoder.encode("password")).thenReturn("encodedPassword");
+        when(bCryptPasswordEncoder.encode("password123@")).thenReturn("encodedPassword");
 
         userService.saveUser(user);
 
@@ -130,12 +131,12 @@ public class UserServiceTest {
         user.setUserID(1);
         user.setUsername("oldUsername");
         user.setEmail("old@example.com");
-        user.setPassword("oldPassword");
+        user.setPassword("oldPassword123@");
 
         when(userRepository.findByUserID(1)).thenReturn(user);
-        when(bCryptPasswordEncoder.encode("newPassword")).thenReturn("encodedNewPassword");
+        when(bCryptPasswordEncoder.encode("newPassword123@")).thenReturn("encodedNewPassword");
 
-        userService.updateUserDetails(1, "newUsername", "new@example.com", "newPassword");
+        userService.updateUserDetails(1, "newUsername", "new@example.com", "newPassword123@");
 
         verify(userRepository, times(1)).save(user);
         assertEquals("newUsername", user.getUsername());
@@ -158,14 +159,36 @@ public class UserServiceTest {
     public void testUpdateUserDetailsEmptyPassword() {
         User user = new User();
         user.setUserID(1);
+        user.setUsername("username");
+        user.setEmail("test@example.com");
+        user.setPassword("password123@");
 
         when(userRepository.findByUserID(1)).thenReturn(user);
 
-        assertThrows(IllegalArgumentException.class, () -> {
-            userService.updateUserDetails(1, "newUsername", "new@example.com", null);
-        });
+        userService.updateUserDetails(1, "newUsername", "new@example.com", "");
 
-        verify(userRepository, never()).save(any(User.class));
+        verify(userRepository, times(1)).save(user);
+        assertEquals("newUsername", user.getUsername());
+        assertEquals("new@example.com", user.getEmail());
+        assertEquals("password123@", user.getPassword());
+    }
+
+    @Test
+    public void testUpdateUserDetailsNullPassword() {
+        User user = new User();
+        user.setUserID(1);
+        user.setUsername("username");
+        user.setEmail("test@example.com");
+        user.setPassword("password123@");
+
+        when(userRepository.findByUserID(1)).thenReturn(user);
+
+        userService.updateUserDetails(1, "newUsername", "new@example.com", null);
+
+        verify(userRepository, times(1)).save(user);
+        assertEquals("newUsername", user.getUsername());
+        assertEquals("new@example.com", user.getEmail());
+        assertEquals("password123@", user.getPassword());
     }
 
     @Test

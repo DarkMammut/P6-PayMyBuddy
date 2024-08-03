@@ -34,7 +34,7 @@ public class ContactController {
 
         User user = userService.getUserByUsername(currentUser.getUsername());
         if (user == null) {
-            logger.warn("Utilisateur introuvable : {}", currentUser.getUsername());
+            logger.error("Utilisateur introuvable : {}", currentUser.getUsername());
             return "redirect:/login";
         }
 
@@ -43,7 +43,7 @@ public class ContactController {
     }
 
     @PostMapping
-    public String addContact(@AuthenticationPrincipal UserDetails currentUser, @RequestParam String connectedEmail) {
+    public String addContact(@AuthenticationPrincipal UserDetails currentUser, @RequestParam String connectedEmail, Model model) {
         logger.info("Demande d'ajout de contact pour l'utilisateur : {}", currentUser.getUsername());
 
         User user = userService.getUserByUsername(currentUser.getUsername());
@@ -51,17 +51,19 @@ public class ContactController {
 
         if (user == null) {
             logger.error("Utilisateur actuel introuvable : {}", currentUser.getUsername());
-            return "/contact";
+            return "redirect:/login";
         }
 
         if (connectedUser == null) {
             logger.error("Utilisateur à connecter est introuvable : {}", connectedEmail);
-            return "/contact";
+            model.addAttribute("error", "Utilisateur introuvable !");
+            return "redirect:/contact?error";
         }
 
         if (user == connectedUser) {
             logger.error("Utilisateur à connecter doit être différent de l'utilisateur actuel : {}", currentUser.getUsername());
-            return "/contact";
+            model.addAttribute("error", "Vous ne pouvez pas ajouter comme contact !");
+            return "redirect:/contact?error";
         }
 
         if (!userConnectionService.connectionExists(currentUser.getUsername(), connectedEmail)) {

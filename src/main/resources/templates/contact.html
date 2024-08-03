@@ -31,7 +31,7 @@
                 <a class="nav-link" href="#" th:href="@{/profile}">Profil<span class="sr-only">(current)</span></a>
             </li>
             <li class="nav-item" >
-                <a class="nav-link active" aria-current="page" href="#" th:href="@{/contact}">Ajouter relation<span
+                <a class="nav-link active text-primary" aria-current="page" href="#" th:href="@{/contact}">Ajouter relation<span
                         class="sr-only">(current)</span></a>
             </li>
             <li class="nav-item">
@@ -53,11 +53,18 @@
             </div>
             <button type="submit" class="btn btn-primary btn-orange mb-2">Ajouter</button>
         </form>
+        <div class="d-flex flex-column align-items-center">
+            <!-- Afficher un message d'erreur si le paramètre 'error' est présent -->
+            <div th:if="${param.error}" class="alert alert-danger mt-3 w-100" role="alert">
+                [[${error}]]
+            </div>
 
-        <!-- Afficher un message de succès si le paramètre 'success' est présent -->
-        <div th:if="${param.success}" class="alert alert-success mt-3">
-            Contact ajouté avec succès!
+            <!-- Afficher un message de succès si le paramètre 'success' est présent -->
+            <div th:if="${param.success}" class="alert alert-success mt-3 w-100" role="alert">
+                Contact ajouté avec succès!
+            </div>
         </div>
+
     </div>
 </div>
 

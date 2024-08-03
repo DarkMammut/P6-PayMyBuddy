@@ -21,11 +21,9 @@ public class ProfileController {
     private static final Logger logger = LoggerFactory.getLogger(ProfileController.class);
 
     private final UserService userService;
-    private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
-    public ProfileController(UserService userService, BCryptPasswordEncoder bCryptPasswordEncoder) {
+    public ProfileController(UserService userService) {
         this.userService = userService;
-        this.bCryptPasswordEncoder = bCryptPasswordEncoder;
     }
 
     @GetMapping
@@ -34,7 +32,7 @@ public class ProfileController {
 
         User user = userService.getUserByUsername(currentUser.getUsername());
         if (user == null) {
-            logger.warn("Utilisateur introuvable : {}", currentUser.getUsername());
+            logger.error("Utilisateur introuvable : {}", currentUser.getUsername());
             return "redirect:/login";
         }
 
@@ -48,16 +46,19 @@ public class ProfileController {
         User existingUser = userService.getUserByUsername(currentUser.getUsername());
 
         if (existingUser == null) {
-            logger.warn("Utilisateur introuvable : {}", currentUser.getUsername());
-            return "redirect:/login";
+            logger.error("Utilisateur introuvable : {}", currentUser.getUsername());
+            model.addAttribute("error", "Utilisateur introuvable !");
+            return "redirect:/profile?error";
         }
 
-        userService.updateUserDetails(existingUser.getUserID(), user.getUsername(), user.getEmail(), user.getPassword());
-        logger.info("Compte mis à jour pour l'utilisateur : {}", existingUser.getUsername());
-
-        model.addAttribute("user", existingUser);
-        model.addAttribute("success", "Compte mis à jour avec succès.");
-
-        return "redirect:/profile";
+        try {
+            userService.updateUserDetails(existingUser.getUserID(), user.getUsername(), user.getEmail(), user.getPassword());
+            logger.info("Compte mis à jour pour l'utilisateur : {}", existingUser.getUsername());
+            return "redirect:/profile?success";
+        } catch (Exception e) {
+            logger.error("Erreur lors de la mise à jour de l'utilisateur {} : {}", existingUser.getUsername(), e.getMessage());
+            model.addAttribute("error", e.getMessage());
+            return "redirect:/profile?error";
+        }
     }
 }

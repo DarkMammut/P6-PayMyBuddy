@@ -20,11 +20,11 @@
         <span class="navbar-brand mb-0 h1">Pay My Buddy</span>
         <ul class="navbar-nav ml-auto">
             <li class="nav-item">
-                <a class="nav-link active" aria-current="page" href="#" th:href="@{/transfer}">Transférer<span
+                <a class="nav-link active text-primary" aria-current="page" href="#" th:href="@{/transfer}">Transférer<span
                         class="sr-only">(current)</span></a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="#" th:href="@{/profile}">Profil<span class="sr-only">(current)</span></a>
+                <a class="nav-link" href="#" th:href="@{/profile}">Profil<span class="sr-only"></span></a>
             </li>
             <li class="nav-item">
                 <a class="nav-link" href="#" th:href="@{/contact}">Ajouter relation<span
@@ -47,14 +47,14 @@
     </div>
 
     <!-- Content specific to add money -->
-    <div class="d-flex justify-content-center mt-5">
+    <div class="d-flex justify-content-center mt-5 p-5">
         <form th:action="@{/transfer/add}" method="post" class="needs-validation w-100" novalidate>
             <div class="d-flex justify-content-center align-items-center">
-                <div class="form-group d-flex mt-2">
-                    <label for="addAmount" class="col-md-8">verser sur votre compte</label>
-                    <div class="input-group col-md-3">
+                <div class="form-group d-flex m-auto">
+                    <label for="addAmount" class="col-md-8">Versement sur votre compte</label>
+                    <div class="input-group col-md-5">
                         <input type="number" id="addAmount" name="addAmount" class="form-control" placeholder="0"
-                               step="1" required>
+                               step="0.01" required>
                         <div class="input-group-append">
                             <span class="input-group-text">€</span>
                         </div>
@@ -63,7 +63,7 @@
                         Veuillez fournir un montant valide.
                     </div>
                 </div>
-                <button type="submit" class="btn btn-primary">Payer</button>
+                <button type="submit" class="btn btn-primary">Verser</button>
             </div>
             <div class="d-flex flex-column align-items-center">
                 <!-- Afficher un message d'erreur si le paramètre 'error' est présent -->
@@ -80,10 +80,10 @@
     </div>
 
     <!-- Content specific to transfer money -->
-    <div class="d-flex justify-content-center mt-5">
+    <div class="container d-flex justify-content-center mt-5">
         <form th:action="@{/transfer}" method="post" class="needs-validation w-100" novalidate>
             <div class="d-flex justify-content-between align-items-center">
-                <div class="form-group mt-2 col-md-4">
+                <div class="form-group m-auto col-md-4">
                     <label for="receiverUsername" class="sr-only">Sélectionner une relation</label>
                     <select id="receiverUsername" name="receiverUsername" class="form-control" required>
                         <option value="0" selected="selected">Sélectionner une relation</option>
@@ -94,7 +94,7 @@
                         Veuillez sélectionner une relation.
                     </div>
                 </div>
-                <div class="form-group mt-2 col-md-4">
+                <div class="form-group m-auto col-md-4">
                     <label for="description" class="sr-only">Description</label>
                     <input type="text" id="description" name="description" class="form-control"
                            placeholder="Description" required>
@@ -102,12 +102,12 @@
                         Veuillez fournir une description.
                     </div>
                 </div>
-                <div class="form-group mt-2 col-md-2">
+                <div class="form-group m-auto col-md-2">
                     <label for="transferAmount" class="sr-only">Montant</label>
                     <div class="input-group">
                         <input type="number" id="transferAmount" name="transferAmount" class="form-control"
                                placeholder="0"
-                               step="1" required>
+                               step="0.01" required>
                         <div class="input-group-append">
                             <span class="input-group-text">€</span>
                         </div>

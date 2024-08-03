@@ -24,7 +24,7 @@ public class AccountService {
         if (account != null) {
             logger.info("Account found: {}", account);
         } else {
-            logger.warn("No account found for user with ID: {}", userId.getUserID());
+            logger.error("No account found for user with ID: {}", userId.getUserID());
         }
         return account;
     }

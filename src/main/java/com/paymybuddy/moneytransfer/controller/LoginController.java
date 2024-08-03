@@ -39,9 +39,9 @@ public class LoginController {
             logger.info("Login successful for user: {}", username);
             return "redirect:/transfer";
         } else {
-            logger.warn("Login failed for user: {}", username);
-            model.addAttribute("error", "Invalid username or password");
-            return "login";
+            logger.error("Login failed for user: {}", username);
+            model.addAttribute("error", "Username ou mot de passe invalide");
+            return "redirect:/login?error";
         }
     }
 }
