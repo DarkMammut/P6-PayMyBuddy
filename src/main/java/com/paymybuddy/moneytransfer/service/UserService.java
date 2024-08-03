@@ -21,22 +21,22 @@ public class UserService {
 
     private static final Pattern EMAIL_PATTERN = Pattern.compile("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,6}$");
     private static final Pattern USERNAME_PATTERN = Pattern.compile("^[a-zA-Z0-9._-]{3,20}$");
-    private static final Pattern PASSWORD_PATTERN = Pattern.compile("^(?=.*[0-9])(?=.*[a-zA-Z])(?=.*[@#$%^&+=]).{8,20}$");
+    private static final Pattern PASSWORD_PATTERN = Pattern.compile("^(?=.*[0-9])(?=.*[a-zA-Z])(?=.*[@#$%^&+=!]).{8,20}$");
 
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final UserConnectionRepository userConnectionRepository;
 
     public void saveUser(User user) {
-        if (!isValidEmail(user.getEmail())) {
+        if (isInvalidEmail(user.getEmail())) {
             logger.error("Invalid email address: {}", user.getEmail());
             throw new IllegalArgumentException("Invalid email format");
         }
-        if (!isValidUsername(user.getUsername())) {
+        if (isInvalidUsername(user.getUsername())) {
             logger.error("Invalid username format: {}", user.getUsername());
             throw new IllegalArgumentException("Invalid username format");
         }
-        if (!isValidPassword(user.getPassword())) {
+        if (isInvalidPassword(user.getPassword())) {
             logger.error("Invalid password format: {}", user.getPassword());
             throw new IllegalArgumentException("Invalid password format");
         }
@@ -79,10 +79,10 @@ public class UserService {
         if (user == null) {
             throw new IllegalArgumentException("User not found");
         }
-        if (!isValidEmail(newEmail)) {
+        if (isInvalidEmail(newEmail)) {
             throw new IllegalArgumentException("Invalid email format");
         }
-        if (!isValidUsername(newUsername)) {
+        if (isInvalidUsername(newUsername)) {
             throw new IllegalArgumentException("Invalid username format");
         }
 
@@ -92,7 +92,7 @@ public class UserService {
         if (newPassword == null || newPassword.isEmpty()) {
             logger.info("New password is empty. Retaining the old password.");
         } else {
-            if (!isValidPassword(newPassword)) {
+            if (isInvalidPassword(newPassword)) {
                 logger.error("New password is invalid.");
                 throw new IllegalArgumentException("Invalid password format");
             }
@@ -110,15 +110,15 @@ public class UserService {
                 .collect(Collectors.toList());
     }
 
-    private boolean isValidEmail(String email) {
-        return email != null && EMAIL_PATTERN.matcher(email).matches();
+    private boolean isInvalidEmail(String email) {
+        return email == null || !EMAIL_PATTERN.matcher(email).matches();
     }
 
-    private boolean isValidUsername(String username) {
-        return username != null && USERNAME_PATTERN.matcher(username).matches();
+    private boolean isInvalidUsername(String username) {
+        return username == null || !USERNAME_PATTERN.matcher(username).matches();
     }
 
-    private boolean isValidPassword(String password) {
-        return password != null && PASSWORD_PATTERN.matcher(password).matches();
+    private boolean isInvalidPassword(String password) {
+        return password == null || !PASSWORD_PATTERN.matcher(password).matches();
     }
 }
