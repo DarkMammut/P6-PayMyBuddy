@@ -8,7 +8,7 @@
 <body>
 <div class="container d-flex justify-content-center align-items-center vh-100">
     <div class="form-container text-center border border-dark rounded p-5" style="width:370px">
-        <div  class="text-white rounded w-75 m-auto p-2" style="background-color: orange">
+        <div class="text-white rounded w-75 m-auto p-2" style="background-color: orange">
             <h1 class="h4 m-auto">Pay My Buddy</h1>
         </div>
 
@@ -32,12 +32,12 @@
         <div class="d-flex flex-column align-items-center">
             <!-- Afficher un message d'erreur si le paramètre 'error' est présent -->
             <div th:if="${param.error}" class="alert alert-danger mt-3 w-100" role="alert">
-                [[${error}]]
+                ${param.error}
             </div>
         </div>
         <div>
             <p>Déjà inscrit ?
-            <a href="" th:href="@{/login}" class="link-primary">Se connecter</a>
+                <a href="" th:href="@{/login}" class="link-primary">Se connecter</a>
             </p>
         </div>
     </div>
