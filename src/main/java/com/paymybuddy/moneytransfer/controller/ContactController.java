@@ -4,6 +4,8 @@ import com.paymybuddy.moneytransfer.model.User;
 import com.paymybuddy.moneytransfer.model.UserConnection;
 import com.paymybuddy.moneytransfer.service.UserConnectionService;
 import com.paymybuddy.moneytransfer.service.UserService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
@@ -12,8 +14,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 
 @Controller
 @RequestMapping("/contact")
@@ -30,11 +33,11 @@ public class ContactController {
 
     @GetMapping
     public String showAddContactForm(@AuthenticationPrincipal UserDetails currentUser, Model model) {
-        logger.info("Affichage du formulaire d'ajout de contact");
+        logger.info("Displaying add contact form for user: {}", currentUser.getUsername());
 
         User user = userService.getUserByUsername(currentUser.getUsername());
         if (user == null) {
-            logger.error("Utilisateur introuvable : {}", currentUser.getUsername());
+            logger.error("User not found: {}", currentUser.getUsername());
             return "redirect:/login";
         }
 
@@ -43,36 +46,31 @@ public class ContactController {
     }
 
     @PostMapping
-    public String addContact(@AuthenticationPrincipal UserDetails currentUser, @RequestParam String connectedEmail, Model model) {
-        logger.info("Demande d'ajout de contact pour l'utilisateur : {}", currentUser.getUsername());
+    public String addContact(@AuthenticationPrincipal UserDetails currentUser, @RequestParam String connectedEmail) {
+        logger.info("Adding contact for user: {}", currentUser.getUsername());
 
         User user = userService.getUserByUsername(currentUser.getUsername());
         User connectedUser = userService.getUserByEmail(connectedEmail);
 
         if (user == null) {
-            logger.error("Utilisateur actuel introuvable : {}", currentUser.getUsername());
+            logger.error("Current user not found: {}", currentUser.getUsername());
             return "redirect:/login";
         }
 
-        if (connectedUser == null) {
-            logger.error("Utilisateur à connecter est introuvable : {}", connectedEmail);
-            model.addAttribute("error", "Utilisateur introuvable !");
-            return "redirect:/contact?error";
+        if (connectedUser == null || user.equals(connectedUser)) {
+            logger.error("Invalid connected user: {}", connectedEmail);
+            String errorMessage = URLEncoder.encode("Utilisateur à connecter invalide.", StandardCharsets.UTF_8);
+            return "redirect:/contact?error=" + errorMessage;
         }
 
-        if (user == connectedUser) {
-            logger.error("Utilisateur à connecter doit être différent de l'utilisateur actuel : {}", currentUser.getUsername());
-            model.addAttribute("error", "Vous ne pouvez pas ajouter comme contact !");
-            return "redirect:/contact?error";
-        }
-
-        if (!userConnectionService.connectionExists(currentUser.getUsername(), connectedEmail)) {
-            logger.info("Ajout d'une nouvelle connexion entre {} et {}", user.getUsername(), connectedUser.getEmail());
+        try {
             userConnectionService.addConnection(user.getUsername(), connectedUser.getEmail());
-        } else {
-            logger.info("La connexion existe déjà entre {} et {}", user.getUsername(), connectedUser.getEmail());
+            logger.info("Successfully added connection between {} and {}", user.getUsername(), connectedUser.getEmail());
+            return "redirect:/contact?success";
+        } catch (Exception e) {
+            logger.error("Error adding connection between {} and {}", user.getUsername(), connectedUser.getEmail(), e);
+            String errorMessage = URLEncoder.encode(e.getMessage(), StandardCharsets.UTF_8);
+            return "redirect:/contact?error=" + errorMessage;
         }
-
-        return "redirect:/contact";
     }
 }

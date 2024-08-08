@@ -45,7 +45,8 @@ public class WebSecurityConfig {
                 .sessionManagement((session) -> session
                         .maximumSessions(1)
                         .maxSessionsPreventsLogin(false)
-                );
+                )
+                .userDetailsService(userDetailsService);
 
         return http.build();
     }

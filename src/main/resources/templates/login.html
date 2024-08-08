@@ -9,7 +9,7 @@
 <body>
 <div class="container d-flex justify-content-center align-items-center vh-100">
     <div class="form-container text-center border border-dark rounded p-5" style="width:370px">
-        <div  class="text-white rounded w-75 m-auto p-2" style="background-color: orange">
+        <div class="text-white rounded w-75 m-auto p-2" style="background-color: orange">
             <h1 class="h4 m-auto">Pay My Buddy</h1>
         </div>
         <form th:action="@{/login}" method="post" class="mt-5">
@@ -32,8 +32,7 @@
         </form>
         <div class="d-flex flex-column align-items-center">
             <!-- Afficher un message d'erreur si le paramètre 'error' est présent -->
-            <div th:if="${param.error}" class="alert alert-danger mt-3 w-100" role="alert">
-                [[${error}]]
+            <div th:if="${param.error}" class="alert alert-danger mt-3 w-100" role="alert" th:text="${param.error}">
             </div>
         </div>
         <div>
@@ -44,21 +43,12 @@
     </div>
 </div>
 
-<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 <script>
-    const togglePassword = document
-        .querySelector('#togglePassword');
+    const togglePassword = document.querySelector('#togglePassword');
     const password = document.querySelector('#password');
     togglePassword.addEventListener('click', () => {
-        // Toggle the type attribute using
-        // getAttribure() method
-        const type = password
-            .getAttribute('type') === 'password' ?
-            'text' : 'password';
+        const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
         password.setAttribute('type', type);
-        // Toggle the eye and bi-eye icon
         this.classList.toggle('bi-eye');
     });
 </script>

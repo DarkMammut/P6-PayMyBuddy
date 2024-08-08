@@ -19,25 +19,48 @@ public class UserConnectionService {
 
     private static final Logger logger = LoggerFactory.getLogger(UserConnectionService.class);
 
-    public void addConnection(String username, String mail) {
-        logger.info("Adding connection for username: {} with email: {}", username, mail);
+    public void addConnection(String username, String email) {
+        logger.info("Adding connection for username: {} with email: {}", username, email);
+
+        if (username == null || email == null) {
+            logger.error("Username or email cannot be null");
+            throw new IllegalArgumentException("Username and email cannot be null");
+        }
+
         User currentUser = userRepository.findByUsername(username);
-        Optional<User> connectedUser = userRepository.findByEmail(mail);
+        Optional<User> connectedUser = userRepository.findByEmail(email);
+
+        if (currentUser == null) {
+            logger.error("User not found: {}", username);
+            throw new RuntimeException("Utilisateur non trouvé");
+        }
 
         if (connectedUser.isPresent()) {
-            UserConnection userConnection = new UserConnection();
-            userConnection.setConnectedUser(connectedUser.get());
-            userConnection.setUser(currentUser);
-            userConnectionRepository.save(userConnection);
-            logger.info("Connection added successfully between {} and {}", username, mail);
+            if (!connectionExists(username, email)) {
+                logger.info("Adding new connection between {} and {}", username, email);
+                UserConnection userConnection = new UserConnection();
+                userConnection.setConnectedUser(connectedUser.get());
+                userConnection.setUser(currentUser);
+                userConnectionRepository.save(userConnection);
+                logger.info("Connection added successfully between {} and {}", username, email);
+            } else {
+                logger.error("Connection already exists between {} and {}", username, email);
+                throw new RuntimeException("L'utilisateur fait déjà partie de vos connexions");
+            }
         } else {
-            logger.error("Email not found: {}", mail);
-            throw new RuntimeException("Email not found");
+            logger.error("Email not found: {}", email);
+            throw new RuntimeException("Utilisateur invalide");
         }
     }
 
     public boolean connectionExists(String username, String email) {
         logger.info("Checking if connection exists for username: {} with email: {}", username, email);
+
+        if (username == null || email == null) {
+            logger.error("Username or email cannot be null");
+            throw new IllegalArgumentException("Username or email cannot be null");
+        }
+
         User currentUser = userRepository.findByUsername(username);
         Optional<User> connectedUserOptional = userRepository.findByEmail(email);
 

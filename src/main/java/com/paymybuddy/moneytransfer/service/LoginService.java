@@ -1,6 +1,5 @@
 package com.paymybuddy.moneytransfer.service;
 
-import com.paymybuddy.moneytransfer.controller.LoginController;
 import com.paymybuddy.moneytransfer.model.User;
 import com.paymybuddy.moneytransfer.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -15,7 +14,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class LoginService {
 
-    Logger logger = LoggerFactory.getLogger(LoginController.class);
+    Logger logger = LoggerFactory.getLogger(LoginService.class);
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
@@ -32,12 +31,24 @@ public class LoginService {
                 logger.info("Password match for username: {}", username);
                 return userOptional;
             } else {
-                logger.warn("Password mismatch for username: {}", username);
+                logger.error("Password mismatch for username: {}", username);
+                throw new PasswordMismatchException("Password mismatch for username");
             }
         } else {
-            logger.warn("No user found for username: {}", username);
+            logger.error("No user found for username: {}", username);
+            throw new UserNotFoundException("No user found for username");
         }
+    }
 
-        return Optional.empty();
+    public static class PasswordMismatchException extends RuntimeException {
+        public PasswordMismatchException(String message) {
+            super(message);
+        }
+    }
+
+    public static class UserNotFoundException extends RuntimeException {
+        public UserNotFoundException(String message) {
+            super(message);
+        }
     }
 }

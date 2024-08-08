@@ -1,18 +1,19 @@
 package com.paymybuddy.moneytransfer.controller;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.ui.Model;
 import com.paymybuddy.moneytransfer.model.User;
 import com.paymybuddy.moneytransfer.service.UserService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 
 @Controller
 @RequestMapping("/profile")
@@ -47,8 +48,8 @@ public class ProfileController {
 
         if (existingUser == null) {
             logger.error("Utilisateur introuvable : {}", currentUser.getUsername());
-            model.addAttribute("error", "Utilisateur introuvable !");
-            return "redirect:/profile?error";
+            String errorMessage = URLEncoder.encode("Utilisateur introuvable", StandardCharsets.UTF_8);
+            return "redirect:/profile?error=" + errorMessage;
         }
 
         try {
@@ -57,8 +58,8 @@ public class ProfileController {
             return "redirect:/profile?success";
         } catch (Exception e) {
             logger.error("Erreur lors de la mise à jour de l'utilisateur {} : {}", existingUser.getUsername(), e.getMessage());
-            model.addAttribute("error", e.getMessage());
-            return "redirect:/profile?error";
+            String errorMessage = URLEncoder.encode(e.getMessage(), StandardCharsets.UTF_8);
+            return "redirect:/profile?error=" + errorMessage;
         }
     }
 }

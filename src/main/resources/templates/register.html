@@ -20,6 +20,9 @@
             <div class="form-group">
                 <input type="text" id="email" name="email" placeholder="Mail" required class="form-control"/>
                 <label for="email" class="sr-only">Mail</label>
+                <div class="invalid-feedback">
+                    Merci de renseigner une adresse email valide.
+                </div>
             </div>
             <div class="form-group">
                 <input type="text" id="password" name="password" placeholder="Mot de passe" required
@@ -31,8 +34,7 @@
 
         <div class="d-flex flex-column align-items-center">
             <!-- Afficher un message d'erreur si le paramètre 'error' est présent -->
-            <div th:if="${param.error}" class="alert alert-danger mt-3 w-100" role="alert">
-                ${param.error}
+            <div th:if="${param.error}" class="alert alert-danger mt-3 w-100" role="alert" th:text="${param.error}">
             </div>
         </div>
         <div>
@@ -42,9 +44,5 @@
         </div>
     </div>
 </div>
-
-<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>

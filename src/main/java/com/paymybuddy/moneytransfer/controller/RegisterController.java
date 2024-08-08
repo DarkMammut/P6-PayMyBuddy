@@ -12,6 +12,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+
 @Controller
 @RequiredArgsConstructor
 public class RegisterController {
@@ -32,19 +35,6 @@ public class RegisterController {
     public String registerUser(@ModelAttribute("user") User user, Model model) {
         logger.info("POST request received for /register");
 
-        // Check for existing username and email
-        if (userService.usernameExists(user.getUsername())) {
-            logger.error("Username '{}' already exists", user.getUsername());
-            model.addAttribute("error", "Username déjà utilisé");
-            return "redirect:/register?error";
-        }
-
-        if (userService.emailExists(user.getEmail())) {
-            logger.error("Email '{}' already exists", user.getEmail());
-            model.addAttribute("error", "Un compte existe déjà avec cette adresse email");
-            return "redirect:/register?error";
-        }
-
         // Save the user and create an account if everything is fine
         try {
             userService.saveUser(user);
@@ -53,7 +43,8 @@ public class RegisterController {
             return "redirect:/login";
         } catch (Exception e) {
             model.addAttribute("error", e.getMessage());
-            return "redirect:/register?error";
+            String errorMessage = URLEncoder.encode(e.getMessage(), StandardCharsets.UTF_8);
+            return "redirect:/register?error=" + errorMessage;
         }
     }
 }

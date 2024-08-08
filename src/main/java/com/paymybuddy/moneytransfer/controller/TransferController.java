@@ -18,6 +18,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.math.BigDecimal;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 @Controller
@@ -75,14 +77,10 @@ public class TransferController {
         User user = userService.getUserByUsername(currentUser.getUsername());
         User receiver = userService.getUserByUsername(receiverUsername);
 
-        if (receiver == null) {
-            logger.error("Destinataire introuvable : {}", receiverUsername);
-            return "redirect:/transfer?error";
-        }
-
-        if (receiver == user) {
-            logger.error("Destinataire doit être différent de l'utilisateur actuel : {}", receiverUsername);
-            return "redirect:/transfer?error";
+        if (receiver == null || receiver == user) {
+            logger.error("Destinataire invalide : {}", receiverUsername);
+            String errorMessage = URLEncoder.encode("Destinataire invalide", StandardCharsets.UTF_8);
+            return "redirect:/transfer?error=" + errorMessage;
         }
 
         if (user == null) {
@@ -97,7 +95,8 @@ public class TransferController {
         } catch (Exception e) {
             logger.error("Erreur lors du traitement du transfert de {} à {} pour un montant de {}: {}",
                     user.getUsername(), receiverUsername, amount, e.getMessage());
-            return "redirect:/transfer?error";
+            String errorMessage = URLEncoder.encode(e.getMessage(), StandardCharsets.UTF_8);
+            return "redirect:/transfer?error=" + errorMessage;
         }
     }
 
@@ -116,7 +115,8 @@ public class TransferController {
             return "redirect:/transfer?addsuccess";
         } catch (Exception e) {
             logger.error("Erreur lors du versement pour un montant de {}: {}", amount, e.getMessage());
-            return "redirect:/transfer?adderror";
+            String errorMessage = URLEncoder.encode(e.getMessage(), StandardCharsets.UTF_8);
+            return "redirect:/transfer?adderror=" + errorMessage;
         }
     }
 }

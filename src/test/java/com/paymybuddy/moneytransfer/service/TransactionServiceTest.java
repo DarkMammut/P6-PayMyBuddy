@@ -119,7 +119,7 @@ public class TransactionServiceTest {
             transactionService.processTransaction(1, "receiver", new BigDecimal("100"), "Test Transaction");
         });
 
-        assertEquals("Insufficient balance. Transaction aborted.", exception.getMessage());
+        assertEquals("Balance insuffisante. Transaction annulée.", exception.getMessage());
         verify(accountRepository, never()).save(senderAccount);
         verify(accountRepository, never()).save(receiverAccount);
         verify(transactionRepository, never()).save(any(Transaction.class));
@@ -133,7 +133,7 @@ public class TransactionServiceTest {
             transactionService.processTransaction(1, "receiver", new BigDecimal("100"), "Test Transaction");
         });
 
-        assertEquals("Sender not found. Transaction aborted.", exception.getMessage());
+        assertEquals("Utilisateur inconnu. Transaction annulée.", exception.getMessage());
         verify(userRepository, times(1)).findByUserID(1);
         verify(accountRepository, never()).findByUserID(any(User.class));
         verify(transactionRepository, never()).save(any(Transaction.class));
@@ -152,7 +152,7 @@ public class TransactionServiceTest {
             transactionService.processTransaction(1, "receiver", new BigDecimal("100"), "Test Transaction");
         });
 
-        assertEquals("Receiver not found. Transaction aborted.", exception.getMessage());
+        assertEquals("Destinataire inconnu. Transaction annulée.", exception.getMessage());
         verify(userRepository, times(1)).findByUserID(1);
         verify(userRepository, times(1)).findByUsername("receiver");
         verify(accountRepository, never()).findByUserID(any(User.class));

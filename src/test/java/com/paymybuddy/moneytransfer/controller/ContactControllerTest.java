@@ -12,7 +12,11 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.ui.Model;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
@@ -72,12 +76,11 @@ public class ContactControllerTest {
         when(currentUser.getUsername()).thenReturn("currentUser");
         when(userService.getUserByUsername(anyString())).thenReturn(user);
         when(userService.getUserByEmail(anyString())).thenReturn(connectedUser);
-        when(userConnectionService.connectionExists(anyString(), anyString())).thenReturn(false);
 
-        String viewName = contactController.addContact(currentUser, "connectedUser@example.com", model);
+        String viewName = contactController.addContact(currentUser, "connectedUser@example.com");
 
         verify(userConnectionService, times(1)).addConnection("currentUser", "connectedUser@example.com");
-        assertEquals("redirect:/contact", viewName);
+        assertEquals("redirect:/contact?success", viewName);
     }
 
     @Test
@@ -85,7 +88,7 @@ public class ContactControllerTest {
         when(currentUser.getUsername()).thenReturn("currentUser");
         when(userService.getUserByUsername(anyString())).thenReturn(null);
 
-        String viewName = contactController.addContact(currentUser, "connectedUser@example.com", model);
+        String viewName = contactController.addContact(currentUser, "connectedUser@example.com");
 
         assertEquals("redirect:/login", viewName);
     }
@@ -99,26 +102,9 @@ public class ContactControllerTest {
         when(userService.getUserByUsername(anyString())).thenReturn(user);
         when(userService.getUserByEmail(anyString())).thenReturn(null);
 
-        String viewName = contactController.addContact(currentUser, "connectedUser@example.com", model);
+        String viewName = contactController.addContact(currentUser, "connectedUser@example.com");
 
-        assertEquals("redirect:/contact?error", viewName);
-    }
-
-    @Test
-    public void testAddContact_ConnectionAlreadyExists() {
-        User user = new User();
-        user.setUsername("currentUser");
-        User connectedUser = new User();
-        connectedUser.setEmail("connectedUser@example.com");
-
-        when(currentUser.getUsername()).thenReturn("currentUser");
-        when(userService.getUserByUsername(anyString())).thenReturn(user);
-        when(userService.getUserByEmail(anyString())).thenReturn(connectedUser);
-        when(userConnectionService.connectionExists(anyString(), anyString())).thenReturn(true);
-
-        String viewName = contactController.addContact(currentUser, "connectedUser@example.com", model);
-
-        verify(userConnectionService, times(0)).addConnection(anyString(), anyString());
-        assertEquals("redirect:/contact", viewName);
+        String expectedErrorMessage = URLEncoder.encode("Utilisateur à connecter invalide.", StandardCharsets.UTF_8);
+        assertEquals("redirect:/contact?error=" + expectedErrorMessage, viewName);
     }
 }

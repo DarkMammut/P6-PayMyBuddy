@@ -4,11 +4,16 @@ import com.paymybuddy.moneytransfer.model.User;
 import com.paymybuddy.moneytransfer.model.UserConnection;
 import com.paymybuddy.moneytransfer.repository.UserConnectionRepository;
 import com.paymybuddy.moneytransfer.repository.UserRepository;
+import com.paymybuddy.moneytransfer.service.exception.InvalidEmailException;
+import com.paymybuddy.moneytransfer.service.exception.InvalidUsernameException;
+import com.paymybuddy.moneytransfer.service.exception.InvalidPasswordException;
+import com.paymybuddy.moneytransfer.service.exception.UserNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.regex.Pattern;
@@ -17,6 +22,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class UserService {
+
     private static final Logger logger = LoggerFactory.getLogger(UserService.class);
 
     private static final Pattern EMAIL_PATTERN = Pattern.compile("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,6}$");
@@ -27,32 +33,21 @@ public class UserService {
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final UserConnectionRepository userConnectionRepository;
 
+    @Transactional
     public void saveUser(User user) {
-        if (isInvalidEmail(user.getEmail())) {
-            logger.error("Invalid email address: {}", user.getEmail());
-            throw new IllegalArgumentException("Invalid email format");
-        }
-        if (isInvalidUsername(user.getUsername())) {
-            logger.error("Invalid username format: {}", user.getUsername());
-            throw new IllegalArgumentException("Invalid username format");
-        }
-        if (isInvalidPassword(user.getPassword())) {
-            logger.error("Invalid password format: {}", user.getPassword());
-            throw new IllegalArgumentException("Invalid password format");
-        }
-
+        validateUser(user);
         logger.info("Saving user: {}", user.getUsername());
         user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
         userRepository.save(user);
     }
 
     public boolean usernameExists(String username) {
-        logger.info("Checking if username exists: {}", username);
+        logger.debug("Checking if username exists: {}", username);
         return userRepository.findByUsername(username) != null;
     }
 
     public boolean emailExists(String email) {
-        logger.info("Checking if email exists: {}", email);
+        logger.debug("Checking if email exists: {}", email);
         return userRepository.findByEmail(email).isPresent();
     }
 
@@ -69,32 +64,30 @@ public class UserService {
     public User getUserByEmail(String email) {
         logger.info("Fetching user by email: {}", email);
         return userRepository.findByEmail(email).orElseThrow(
-                () -> new RuntimeException("Email not found")
+                () -> new UserNotFoundException("User not found with email: " + email)
         );
     }
 
+    @Transactional
     public void updateUserDetails(int userId, String newUsername, String newEmail, String newPassword) {
         logger.info("Updating user details for userId: {}", userId);
         User user = getUserByUserId(userId);
         if (user == null) {
-            throw new IllegalArgumentException("User not found");
+            throw new UserNotFoundException("User not found with ID: " + userId);
         }
         if (isInvalidEmail(newEmail)) {
-            throw new IllegalArgumentException("Invalid email format");
+            throw new InvalidEmailException("Invalid email: " + newEmail);
         }
         if (isInvalidUsername(newUsername)) {
-            throw new IllegalArgumentException("Invalid username format");
+            throw new InvalidUsernameException("Invalid username: " + newUsername);
         }
 
         user.setUsername(newUsername);
         user.setEmail(newEmail);
 
-        if (newPassword == null || newPassword.isEmpty()) {
-            logger.info("New password is empty. Retaining the old password.");
-        } else {
+        if (newPassword != null && !newPassword.isEmpty()) {
             if (isInvalidPassword(newPassword)) {
-                logger.error("New password is invalid.");
-                throw new IllegalArgumentException("Invalid password format");
+                throw new InvalidPasswordException("Invalid password format");
             }
             user.setPassword(bCryptPasswordEncoder.encode(newPassword));
         }
@@ -108,6 +101,18 @@ public class UserService {
         return connections.stream()
                 .map(UserConnection::getConnectedUser)
                 .collect(Collectors.toList());
+    }
+
+    private void validateUser(User user) {
+        if (isInvalidEmail(user.getEmail())) {
+            throw new InvalidEmailException("Invalid email: " + user.getEmail());
+        }
+        if (isInvalidUsername(user.getUsername())) {
+            throw new InvalidUsernameException("Invalid username: " + user.getUsername());
+        }
+        if (isInvalidPassword(user.getPassword())) {
+            throw new InvalidPasswordException("Invalid password format");
+        }
     }
 
     private boolean isInvalidEmail(String email) {

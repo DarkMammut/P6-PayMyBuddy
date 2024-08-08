@@ -110,7 +110,7 @@ public class TransferControllerTest {
         String viewName = transferController.processTransfer(currentUser, "receiverUser", "Test description", BigDecimal.valueOf(100));
 
         verify(userService, times(1)).getUserByUsername("testUser");
-        assertEquals("redirect:/transfer?error", viewName);
+        assertEquals("redirect:/transfer?error=Destinataire+invalide", viewName);
     }
 
     @Test
@@ -126,7 +126,7 @@ public class TransferControllerTest {
         String viewName = transferController.processTransfer(currentUser, "receiverUser", "Test description", BigDecimal.valueOf(100));
 
         verify(userService, times(1)).getUserByUsername("receiverUser");
-        assertEquals("redirect:/transfer?error", viewName);
+        assertEquals("redirect:/transfer?error=Destinataire+invalide", viewName);
     }
 
     @Test
@@ -141,7 +141,7 @@ public class TransferControllerTest {
 
         String viewName = transferController.processTransfer(currentUser, "testUser", "Test description", BigDecimal.valueOf(100));
 
-        assertEquals("redirect:/transfer?error", viewName);
+        assertEquals("redirect:/transfer?error=Destinataire+invalide", viewName);
     }
 
     @Test
@@ -181,7 +181,7 @@ public class TransferControllerTest {
         String viewName = transferController.processTransfer(currentUser, "receiverUser", "Test description", BigDecimal.valueOf(100));
 
         verify(transactionService, times(1)).processTransaction(user.getUserID(), "receiverUser", BigDecimal.valueOf(100), "Test description");
-        assertEquals("redirect:/transfer?error", viewName);
+        assertEquals("redirect:/transfer?error=Transaction+failed", viewName);
     }
 
     @Test
@@ -226,6 +226,6 @@ public class TransferControllerTest {
         String viewName = transferController.proccessAddMoney(currentUser, BigDecimal.valueOf(100));
 
         verify(accountService, times(1)).changeBalance(user, BigDecimal.valueOf(100));
-        assertEquals("redirect:/transfer?adderror", viewName);
+        assertEquals("redirect:/transfer?adderror=Failed+to+add+money", viewName);
     }
 }

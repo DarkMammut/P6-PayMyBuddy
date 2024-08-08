@@ -57,9 +57,11 @@ public class LoginServiceTest {
         when(userRepository.findByUsername("testuser")).thenReturn(user);
         when(passwordEncoder.matches("wrongpassword", "encodedPassword")).thenReturn(false);
 
-        Optional<User> result = loginService.login("testuser", "wrongpassword");
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> {
+            loginService.login("testuser", "wrongpassword");
+        });
 
-        assertFalse(result.isPresent());
+        assertEquals("Password mismatch for username", exception.getMessage());
         verify(userRepository, times(1)).findByUsername("testuser");
         verify(passwordEncoder, times(1)).matches("wrongpassword", "encodedPassword");
     }
@@ -68,9 +70,11 @@ public class LoginServiceTest {
     public void testLoginUserNotFound() {
         when(userRepository.findByUsername("nonexistentuser")).thenReturn(null);
 
-        Optional<User> result = loginService.login("nonexistentuser", "password");
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> {
+            loginService.login("nonexistentuser", "password");
+        });
 
-        assertFalse(result.isPresent());
+        assertEquals("No user found for username", exception.getMessage());
         verify(userRepository, times(1)).findByUsername("nonexistentuser");
         verify(passwordEncoder, never()).matches(anyString(), anyString());
     }

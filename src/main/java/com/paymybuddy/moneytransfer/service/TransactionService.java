@@ -71,15 +71,15 @@ public class TransactionService {
                 logger.info("Transaction processed successfully: {} -> {} ({} {})", sender.getUsername(), receiver.getUsername(), amount, description);
             } else {
                 logger.error("Insufficient balance: {}. Transaction aborted.", senderAccount.getBalance());
-                throw new RuntimeException("Insufficient balance. Transaction aborted.");
+                throw new RuntimeException("Balance insuffisante. Transaction annulée.");
             }
         } else {
             if (sender == null) {
                 logger.error("Sender with ID: {} not found", senderId);
-                throw new RuntimeException("Sender not found. Transaction aborted.");
+                throw new RuntimeException("Utilisateur inconnu. Transaction annulée.");
             } else {
                 logger.error("Receiver with username: {} not found", receiverUsername);
-                throw new RuntimeException("Receiver not found. Transaction aborted.");
+                throw new RuntimeException("Destinataire inconnu. Transaction annulée.");
             }
         }
     }

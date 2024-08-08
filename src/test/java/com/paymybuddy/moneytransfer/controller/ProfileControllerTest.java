@@ -7,10 +7,9 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.ui.Model;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.ui.Model;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
@@ -91,6 +90,6 @@ public class ProfileControllerTest {
 
         String viewName = profileController.updateAccount(userDetails, updatedUser, model);
 
-        assertEquals("redirect:/profile?error", viewName);
+        assertEquals("redirect:/profile?error=Utilisateur+introuvable", viewName);
     }
 }

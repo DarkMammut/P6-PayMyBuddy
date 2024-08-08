@@ -1,18 +1,16 @@
 package com.paymybuddy.moneytransfer.controller;
 
-import com.paymybuddy.moneytransfer.model.User;
 import com.paymybuddy.moneytransfer.service.LoginService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import javax.servlet.http.HttpServletRequest;
-import java.util.Optional;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 
 @Controller
 @RequestMapping("/login")
@@ -32,16 +30,16 @@ public class LoginController {
     }
 
     @PostMapping
-    public String login(@RequestParam String username, @RequestParam String password, HttpServletRequest request, Model model) {
+    public String login(@RequestParam String username, @RequestParam String password) {
         logger.info("Attempting login for user: {}", username);
-        Optional<User> userOptional = loginService.login(username, password);
-        if (userOptional.isPresent()) {
+        try {
+            loginService.login(username, password);
             logger.info("Login successful for user: {}", username);
             return "redirect:/transfer";
-        } else {
-            logger.error("Login failed for user: {}", username);
-            model.addAttribute("error", "Username ou mot de passe invalide");
-            return "redirect:/login?error";
+        } catch (Exception e) {
+            logger.error("Erreur lors de la connexion de l'utilisateur {} : {}", username, e.getMessage());
+            String errorMessage = URLEncoder.encode(e.getMessage(), StandardCharsets.UTF_8);
+            return "redirect:/login?error=" + errorMessage;
         }
     }
 }

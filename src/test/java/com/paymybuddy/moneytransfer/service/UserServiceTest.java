@@ -4,6 +4,7 @@ import com.paymybuddy.moneytransfer.model.User;
 import com.paymybuddy.moneytransfer.model.UserConnection;
 import com.paymybuddy.moneytransfer.repository.UserConnectionRepository;
 import com.paymybuddy.moneytransfer.repository.UserRepository;
+import com.paymybuddy.moneytransfer.service.exception.UserNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -12,8 +13,8 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.util.Collections;
-import java.util.Optional;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -148,7 +149,7 @@ public class UserServiceTest {
     public void testUpdateUserDetailsUserNotFound() {
         when(userRepository.findByUserID(1)).thenReturn(null);
 
-        assertThrows(IllegalArgumentException.class, () -> {
+        assertThrows(UserNotFoundException.class, () -> {
             userService.updateUserDetails(1, "newUsername", "new@example.com", "newPassword");
         });
 
