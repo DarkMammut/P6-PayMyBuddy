@@ -32,7 +32,7 @@
         </form>
         <div class="d-flex flex-column align-items-center">
             <!-- Afficher un message d'erreur si le paramètre 'error' est présent -->
-            <div th:if="${param.error}" class="alert alert-danger mt-3 w-100" role="alert" th:text="${param.error}">
+            <div th:if="${param.error}" class="alert alert-danger mt-3 w-100" role="alert" th:text="Username ou mot de passe invalide">
             </div>
         </div>
         <div>
