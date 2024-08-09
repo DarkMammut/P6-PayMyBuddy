@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
@@ -19,6 +20,7 @@ public class UserConnectionService {
 
     private static final Logger logger = LoggerFactory.getLogger(UserConnectionService.class);
 
+    @Transactional
     public void addConnection(String username, String email) {
         logger.info("Adding connection for username: {} with email: {}", username, email);
 

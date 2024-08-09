@@ -3,6 +3,7 @@ package com.paymybuddy.moneytransfer.service;
 import com.paymybuddy.moneytransfer.model.Account;
 import com.paymybuddy.moneytransfer.model.User;
 import com.paymybuddy.moneytransfer.repository.AccountRepository;
+import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +30,7 @@ public class AccountService {
         return account;
     }
 
+    @Transactional
     public void createAccount(User userId) {
         logger.info("Creating account for user with ID: {}", userId.getUserID());
         Account existingAccount = accountRepository.findByUserID(userId);
@@ -45,6 +47,7 @@ public class AccountService {
         logger.info("Account successfully created for user with ID: {}", userId.getUserID());
     }
 
+    @Transactional
     public void changeBalance(User userId, BigDecimal newBalance) {
         logger.info("Changing balance for user with ID: {}. Amount: {}", userId.getUserID(), newBalance);
         Account currentAccount = accountRepository.findByUserID(userId);
